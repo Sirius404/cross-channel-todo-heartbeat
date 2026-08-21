@@ -1,6 +1,6 @@
 # Cross-channel Todo Heartbeat
 
-用 Codex Heartbeat 每天只读扫描微信、Telegram 和 Lark，找出需要自己处理、回复或拍板的事项。它不使用 cron，不自动回消息，也不写入 Linear。
+用 Codex Heartbeat 每天只读扫描微信、Telegram、Lark 和 Codex 任务，找出需要自己处理、回复、拍板或继续的事项。它不使用 cron，不自动回消息、续跑任务或写入 Linear。
 
 ## 安全边界
 
@@ -76,6 +76,17 @@ opencli lark-cli im +chat-list --as user --sort active_time --format json
 opencli lark-cli im +chat-messages-list --as user --chat-id oc_xxx --start '<ISO>' --end '<ISO>' --format json
 opencli lark-cli im +messages-search --as user --is-at-me --start '<ISO>' --end '<ISO>' --page-all --format json
 ```
+
+### Codex 没有回应 / 应该继续
+
+Heartbeat 先读取最近任务和全部置顶任务，再只检查可疑任务的最近几轮：
+
+- 用户最后一条消息之后没有助手最终回应；
+- `systemError`；
+- `active` 超过 30 分钟没有新进展，且最近请求仍未完成；
+- 助手明确说将继续，但任务中途停止且没有最终交付。
+
+`idle`、`notLoaded`、正常完成、等待用户输入都不会仅凭状态被列入。扫描只报告任务、卡点和建议动作，不会自动续跑、发消息、归档或修改任务。
 
 ## Heartbeat，不用 cron
 
