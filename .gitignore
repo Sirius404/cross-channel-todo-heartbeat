@@ -1,0 +1,16 @@
+.env
+config.json
+state.json
+output/
+*.session
+*.session-journal
+*.db
+*.db-*
+*.sqlite*
+all_keys.json
+memory.md
+decrypted/
+cache/
+.DS_Store
+__pycache__/
+*.pyc

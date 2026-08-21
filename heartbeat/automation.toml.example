@@ -1,0 +1,7 @@
+version = 1
+id = "cross-channel-todo"
+kind = "heartbeat"
+name = "微信 Telegram Lark 每日待办扫描"
+prompt = "将 heartbeat/prompt.md 的完整内容粘贴到这里，并把仓库路径写成绝对路径。"
+status = "ACTIVE"
+rrule = "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;BYHOUR=9;BYMINUTE=0;BYSECOND=0"

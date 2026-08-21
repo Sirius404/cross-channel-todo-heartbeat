@@ -1,0 +1,26 @@
+#!/bin/sh
+set -eu
+
+WX_CMD="${WX_BIN:-$(command -v wx || true)}"
+[ -n "$WX_CMD" ] || { echo "wx not found; set WX_BIN" >&2; exit 1; }
+WX_DIR=$(dirname "$WX_CMD")
+if [ -x "$WX_DIR/node" ]; then
+  PATH="$WX_DIR:$PATH"
+  export PATH
+fi
+
+MTIMES="${WX_CLI_HOME:-$HOME/.wx-cli}/cache/_mtimes.json"
+if ! CHECK=$("$WX_CMD" sessions --limit 1 --json 2>&1); then
+  case "$CHECK" in
+    *"no such table: SessionTable"*)
+      if [ -f "$MTIMES" ]; then
+        CACHE=$(jq -r '."session/session.db".path // empty' "$MTIMES")
+        if [ -n "$CACHE" ]; then
+          /usr/bin/sqlite3 "$CACHE" "CREATE VIEW IF NOT EXISTS SessionTable AS SELECT m_nsUserName AS username, m_uUnReadCount AS unread_count, '' AS summary, m_uLastTime AS last_timestamp, 0 AS last_msg_type, '' AS last_msg_sender, '' AS last_sender_display_name FROM SessionAbstract;"
+        fi
+      fi
+      ;;
+  esac
+fi
+
+exec "$WX_CMD" "$@"

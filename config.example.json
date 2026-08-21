@@ -1,0 +1,19 @@
+{
+  "timezone": "Asia/Shanghai",
+  "scan_hours": 24,
+  "wechat": {
+    "bin": "scripts/wx-local",
+    "session_limit": 40,
+    "keywords": ["待办", "请确认", "请回复", "审批", "截止"]
+  },
+  "telegram": {
+    "chat_name_regex": "customer|client|project",
+    "chat_ids": [],
+    "limit_per_chat": 100
+  },
+  "lark": {
+    "profile": "",
+    "chat_ids": [],
+    "search_queries": ["请确认", "请回复", "待办", "审批"]
+  }
+}
