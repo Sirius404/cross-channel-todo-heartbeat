@@ -7,7 +7,8 @@
 1. 微信：运行仓库内 `scripts/wx_scan.py`。必须同时检查新消息、真人未读会话和最近会话；仅对相关会话补充上下文。不得修改微信源数据库、导出附件或展示无关私聊。
 2. Telegram：读取 `config.json` 中的 `chat_name_regex` 和 `chat_ids`，运行 `scripts/tg_live_scan.py`。客户群不能只按单一品牌词筛选；忽略广告、行情喊单、机器人和无关频道。
 3. Lark：以 lark-cli 用户身份运行只读的 `im +chat-list`、`im +chat-messages-list` 和必要时的 `im +messages-search --page-all`。优先配置内已知客户群和私聊。
-4. 不向 Linear 或其他外部系统写入任何内容。
+4. Codex 任务：先用任务列表工具检查最近任务和所有置顶任务，再只读取可疑任务的最近几轮。重点检查 `systemError`、超过 30 分钟没有进展的 `active`，以及用户最后一条消息之后没有助手最终回应的任务。`idle` 或 `notLoaded` 本身不代表异常；已明确完成、有最终答复或等待用户输入的任务不提醒。不得自动发送消息、续跑、归档或修改任务。
+5. 不向 Linear 或其他外部系统写入任何内容。
 
 Codex session 压缩是消息源只读之外唯一允许的本地写入。运行 `scripts/compress_sessions.py --apply`，并通过重复的 `--protected-cwd` 跳过客户工作目录。只处理超过 100MB 且至少 30 分钟未修改的 session；不得处理归档目录、打开中的 session 或修改 `state_5.sqlite`。
 
@@ -19,7 +20,9 @@ Codex session 压缩是消息源只读之外唯一允许的本地写入。运行
 - 需要我回复：给一句回复要点，但不要代发。
 - 等待别人 / Blockers。
 - 低置信度候选。
+- Codex 没有回应：任务名、最后更新时间、用户最后请求和缺失的回应。
+- 应该继续的 Codex session：任务名、当前卡点、停止原因和建议继续动作。`systemError` 单列；运行中的任务只有超过 30 分钟无进展才列入。
 - 扫描状态：微信、Telegram、Lark 分别标记成功、部分成功或失败原因。
 - Session 压缩：扫描、修改、跳过打开、跳过保护目录、失败数量和压缩前后字节数。
 
-若没有新待办，明确写“今日无新增待办”，不要重复旧事项凑数。
+若没有新待办且没有异常 Codex session，明确写“今日无新增待办，Codex 无待续任务”，不要重复旧事项凑数。
